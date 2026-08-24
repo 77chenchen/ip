@@ -1,9 +1,11 @@
+package wenwen;
+
 /**
  * Represents one task in the chatbot's task list.
  */
 public class Task {
-    protected String description;
-    protected boolean isDone;
+    private final String description;
+    private boolean isDone;
 
     /**
      * Creates a task that is initially not done.
