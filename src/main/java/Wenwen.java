@@ -35,6 +35,13 @@ public class Wenwen {
                     System.out.println((i + 1) + ".[" + statusIcon + "] " + tasks[i]);
                 }
                 System.out.println(line);
+            } else if (input.startsWith("unmark ")) {
+                int taskNumber = Integer.parseInt(input.substring(7));
+                int taskIndex = taskNumber - 1;
+                isDone[taskIndex] = false;
+                System.out.println("OK, I've marked this task as not done yet:");
+                System.out.println("  [ ] " + tasks[taskIndex]);
+                System.out.println(line);
             } else if (input.startsWith("mark ")) {
                 int taskNumber = Integer.parseInt(input.substring(5));
                 int taskIndex = taskNumber - 1;
