@@ -1,6 +1,6 @@
 ---
 name: seedu-git-standard
-description: Apply the SE-EDU Git conventions for this project. Use when proposing, reviewing, or creating commit messages and branch names.
+description: Apply the SE-EDU Git conventions for this project's commits and branches.
 ---
 
 # SE-EDU Git Standard
@@ -29,3 +29,5 @@ For branch names:
 
 - Use meaningful kebab-case names, such as `refactor-ui-tests`.
 - If tied to an issue, prefer `issueNumber-some-keywords`.
+- For course increments, preserve the required grading names exactly, such as
+  `branch-Level-5`, `branch-A-Packages`, and their matching tags.
