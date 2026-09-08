@@ -1,4 +1,4 @@
-package wenwen;
+package wenwen.task;
 
 /**
  * Represents one task in the chatbot's task list.

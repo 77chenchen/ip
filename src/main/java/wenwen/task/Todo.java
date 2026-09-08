@@ -1,4 +1,4 @@
-package wenwen;
+package wenwen.task;
 
 /**
  * Represents a task without an attached date or time.

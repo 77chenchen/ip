@@ -2,6 +2,12 @@ package wenwen;
 
 import java.util.Scanner;
 
+import wenwen.exception.WenwenException;
+import wenwen.task.Deadline;
+import wenwen.task.Event;
+import wenwen.task.Task;
+import wenwen.task.Todo;
+
 /**
  * Starts the Wenwen chatbot and handles user commands.
  */

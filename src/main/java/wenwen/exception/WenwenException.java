@@ -1,4 +1,4 @@
-package wenwen;
+package wenwen.exception;
 
 /**
  * Represents an error caused by invalid user input in the Wenwen chatbot.

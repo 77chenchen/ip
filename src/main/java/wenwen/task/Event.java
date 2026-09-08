@@ -1,4 +1,4 @@
-package wenwen;
+package wenwen.task;
 
 /**
  * Represents a task that occurs between a specified start and end time.
