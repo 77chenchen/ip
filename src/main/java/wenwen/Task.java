@@ -3,7 +3,7 @@ package wenwen;
 /**
  * Represents one task in the chatbot's task list.
  */
-public class Task {
+public abstract class Task {
     private final String description;
     private boolean isDone;
 
@@ -12,7 +12,7 @@ public class Task {
      *
      * @param description The text describing the task.
      */
-    public Task(String description) {
+    protected Task(String description) {
         this.description = description;
         this.isDone = false;
     }
@@ -41,12 +41,19 @@ public class Task {
     }
 
     /**
+     * Returns the one-letter symbol for this task type.
+     *
+     * @return The task type symbol.
+     */
+    protected abstract String getTypeIcon();
+
+    /**
      * Returns this task in the display format used by the chatbot.
      *
      * @return The formatted task status and description.
      */
     @Override
     public String toString() {
-        return "[" + getStatusIcon() + "] " + description;
+        return "[" + getTypeIcon() + "][" + getStatusIcon() + "] " + description;
     }
 }
