@@ -1,6 +1,6 @@
 ---
 name: seedu-java-coding-standard
-description: Apply the SE-EDU Java coding standard for this project. Use when writing, editing, or reviewing Java code in this repository.
+description: Apply the SE-EDU Java coding standard for this project's Java code.
 ---
 
 # SE-EDU Java Coding Standard
@@ -31,6 +31,10 @@ increment explicitly requires otherwise:
 - Write descriptive Javadocs for all public classes and public methods, except
   simple getters/setters, inherited overrides whose parent Javadoc applies, and
   test methods.
+- When a documented method lists `@param` or `@throws` tags, keep the tags in
+  sync with the actual method signature.
+- Keep imports explicit and grouped consistently: Java standard library imports
+  first, then a blank line before project imports.
 - Write comments in English using American spelling, and add comments only when
   they clarify purpose or non-obvious behavior.
 

@@ -106,7 +106,9 @@ public class Wenwen {
      * Marks the task named in the user input as completed.
      *
      * @param tasks The task array containing stored tasks.
+     * @param taskCount The number of tasks currently stored.
      * @param input The full user command.
+     * @throws WenwenException If the command does not contain a valid task number.
      */
     private static void markTaskAsDone(Task[] tasks, int taskCount, String input) throws WenwenException {
         int taskIndex = getTaskIndex(input, MARK_PREFIX, taskCount);
@@ -120,7 +122,9 @@ public class Wenwen {
      * Marks the task named in the user input as not completed.
      *
      * @param tasks The task array containing stored tasks.
+     * @param taskCount The number of tasks currently stored.
      * @param input The full user command.
+     * @throws WenwenException If the command does not contain a valid task number.
      */
     private static void markTaskAsNotDone(Task[] tasks, int taskCount, String input) throws WenwenException {
         int taskIndex = getTaskIndex(input, UNMARK_PREFIX, taskCount);
@@ -145,7 +149,7 @@ public class Wenwen {
 
         try {
             taskNumber = Integer.parseInt(taskNumberText);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException exception) {
             throw new WenwenException("Please give me a valid task number for '" + commandPrefix + "'.");
         }
 
@@ -261,7 +265,8 @@ public class Wenwen {
      */
     private static void ensureTaskSpace(int taskCount) throws WenwenException {
         if (taskCount >= MAX_TASKS) {
-            throw new WenwenException("Your task list is full. Please complete the current list before adding more.");
+            throw new WenwenException("Your task list is full. "
+                    + "Please complete the current list before adding more.");
         }
     }
 
