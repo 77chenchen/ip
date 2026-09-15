@@ -13,8 +13,18 @@ public abstract class Task {
      * @param description The text describing the task.
      */
     protected Task(String description) {
+        this(description, false);
+    }
+
+    /**
+     * Creates a task with its saved completion state.
+     *
+     * @param description The text describing the task.
+     * @param isDone Whether the task is completed.
+     */
+    protected Task(String description, boolean isDone) {
         this.description = description;
-        this.isDone = false;
+        this.isDone = isDone;
     }
 
     /**
@@ -38,6 +48,24 @@ public abstract class Task {
      */
     public String getStatusIcon() {
         return isDone ? "X" : " ";
+    }
+
+    /**
+     * Returns the text describing this task.
+     *
+     * @return The task description.
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Returns whether this task is completed.
+     *
+     * @return True if this task is completed.
+     */
+    public boolean isDone() {
+        return isDone;
     }
 
     /**

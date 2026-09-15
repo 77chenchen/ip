@@ -15,9 +15,39 @@ public class Event extends Task {
      * @param to The event's ending date or time.
      */
     public Event(String description, String from, String to) {
-        super(description);
+        this(description, from, to, false);
+    }
+
+    /**
+     * Creates an event with its saved completion state.
+     *
+     * @param description The text describing the event.
+     * @param from The event's starting date or time.
+     * @param to The event's ending date or time.
+     * @param isDone Whether the event is completed.
+     */
+    public Event(String description, String from, String to, boolean isDone) {
+        super(description, isDone);
         this.from = from;
         this.to = to;
+    }
+
+    /**
+     * Returns the event's starting date or time.
+     *
+     * @return The starting date or time.
+     */
+    public String getFrom() {
+        return from;
+    }
+
+    /**
+     * Returns the event's ending date or time.
+     *
+     * @return The ending date or time.
+     */
+    public String getTo() {
+        return to;
     }
 
     @Override

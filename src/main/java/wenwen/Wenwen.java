@@ -1,10 +1,12 @@
 package wenwen;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 import wenwen.exception.WenwenException;
+import wenwen.storage.Storage;
 import wenwen.task.Deadline;
 import wenwen.task.Event;
 import wenwen.task.Task;
@@ -14,6 +16,7 @@ import wenwen.task.Todo;
  * Starts the Wenwen chatbot and handles user commands.
  */
 public class Wenwen {
+    private static final Path DATA_FILE_PATH = Path.of("data", "wenwen.txt");
     private static final String LINE = "____________________________________________________________";
     private static final String TODO_PREFIX = "todo";
     private static final String DEADLINE_PREFIX = "deadline";
@@ -39,7 +42,8 @@ public class Wenwen {
         printGreeting();
 
         Scanner scanner = new Scanner(System.in);
-        List<Task> tasks = new ArrayList<>();
+        Storage storage = new Storage(DATA_FILE_PATH);
+        List<Task> tasks = loadTasks(storage);
 
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine().trim();
@@ -53,22 +57,43 @@ public class Wenwen {
                     printTaskList(tasks);
                 } else if (input.startsWith(UNMARK_PREFIX)) {
                     markTaskAsNotDone(tasks, input);
+                    storage.saveTasks(tasks);
                 } else if (input.startsWith(MARK_PREFIX)) {
                     markTaskAsDone(tasks, input);
+                    storage.saveTasks(tasks);
                 } else if (input.startsWith(DELETE_PREFIX)) {
                     deleteTask(tasks, input);
+                    storage.saveTasks(tasks);
                 } else if (input.startsWith(TODO_PREFIX)) {
                     addTodo(tasks, input);
+                    storage.saveTasks(tasks);
                 } else if (input.startsWith(DEADLINE_PREFIX)) {
                     addDeadline(tasks, input);
+                    storage.saveTasks(tasks);
                 } else if (input.startsWith(EVENT_PREFIX)) {
                     addEvent(tasks, input);
+                    storage.saveTasks(tasks);
                 } else {
                     throw new WenwenException("Sorry, I don't know that command yet.");
                 }
             } catch (WenwenException e) {
                 printError(e.getMessage());
             }
+        }
+    }
+
+    /**
+     * Loads saved tasks without preventing startup when the data is unavailable.
+     *
+     * @param storage The storage service to load from.
+     * @return The saved tasks, or an empty list if loading fails.
+     */
+    private static List<Task> loadTasks(Storage storage) {
+        try {
+            return storage.loadTasks();
+        } catch (WenwenException exception) {
+            printError(exception.getMessage() + " Starting with an empty list instead.");
+            return new ArrayList<>();
         }
     }
 
@@ -94,7 +119,7 @@ public class Wenwen {
     /**
      * Prints all currently stored tasks.
      *
-     * @param tasks The task array containing stored tasks.
+     * @param tasks The list containing stored tasks.
      */
     private static void printTaskList(List<Task> tasks) {
         System.out.println("Here are the tasks in your list:");
@@ -107,7 +132,7 @@ public class Wenwen {
     /**
      * Marks the task named in the user input as completed.
      *
-     * @param tasks The task array containing stored tasks.
+     * @param tasks The list containing stored tasks.
      * @param input The full user command.
      * @throws WenwenException If the command does not contain a valid task number.
      */
@@ -122,7 +147,7 @@ public class Wenwen {
     /**
      * Marks the task named in the user input as not completed.
      *
-     * @param tasks The task array containing stored tasks.
+     * @param tasks The list containing stored tasks.
      * @param input The full user command.
      * @throws WenwenException If the command does not contain a valid task number.
      */
@@ -179,7 +204,7 @@ public class Wenwen {
     /**
      * Adds a todo task from the user input.
      *
-     * @param tasks The task array containing stored tasks.
+     * @param tasks The list containing stored tasks.
      * @param input The full user command.
      * @throws WenwenException If the todo description is empty.
      */
@@ -195,7 +220,7 @@ public class Wenwen {
     /**
      * Adds a deadline task from the user input if it follows the expected command format.
      *
-     * @param tasks The task array containing stored tasks.
+     * @param tasks The list containing stored tasks.
      * @param input The full user command.
      * @throws WenwenException If the deadline command has invalid or incomplete details.
      */
@@ -218,7 +243,7 @@ public class Wenwen {
     /**
      * Adds an event task from the user input if it follows the expected command format.
      *
-     * @param tasks The task array containing stored tasks.
+     * @param tasks The list containing stored tasks.
      * @param input The full user command.
      * @throws WenwenException If the event command has invalid or incomplete details.
      */
