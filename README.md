@@ -23,3 +23,22 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
     ```
 
 **Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+
+## Building the executable JAR
+
+Use the included Gradle wrapper to build a self-contained executable JAR:
+
+```shell
+./gradlew clean shadowJar
+```
+
+On Windows, run `gradlew.bat clean shadowJar` instead. Gradle uses Java 25 to compile the project and downloads a
+matching JDK automatically when one is not already installed.
+
+The generated file is `build/libs/Wenwen.jar`. To run it as a user will:
+
+1. Copy `Wenwen.jar` into an empty folder.
+1. Open a command window in that folder.
+1. Run `java -jar "Wenwen.jar"`.
+
+Wenwen creates its `data/wenwen.txt` task file relative to the folder from which the JAR is run.
