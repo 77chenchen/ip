@@ -1,8 +1,12 @@
 package wenwen;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import wenwen.exception.WenwenException;
+import wenwen.storage.Storage;
 import wenwen.task.Deadline;
 import wenwen.task.Event;
 import wenwen.task.Task;
@@ -12,7 +16,7 @@ import wenwen.task.Todo;
  * Starts the Wenwen chatbot and handles user commands.
  */
 public class Wenwen {
-    private static final int MAX_TASKS = 100;
+    private static final Path DATA_FILE_PATH = Path.of("data", "wenwen.txt");
     private static final String LINE = "____________________________________________________________";
     private static final String TODO_PREFIX = "todo";
     private static final String DEADLINE_PREFIX = "deadline";
@@ -37,8 +41,8 @@ public class Wenwen {
         printGreeting();
 
         Scanner scanner = new Scanner(System.in);
-        Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
+        Storage storage = new Storage(DATA_FILE_PATH);
+        List<Task> tasks = loadTasks(storage);
 
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine().trim();
@@ -49,23 +53,43 @@ public class Wenwen {
                     printFarewell();
                     break;
                 } else if (input.equals("list")) {
-                    printTaskList(tasks, taskCount);
+                    printTaskList(tasks);
                 } else if (input.startsWith(UNMARK_PREFIX)) {
-                    markTaskAsNotDone(tasks, taskCount, input);
+                    markTaskAsNotDone(tasks, input);
+                    storage.saveTasks(tasks);
                 } else if (input.startsWith(MARK_PREFIX)) {
-                    markTaskAsDone(tasks, taskCount, input);
+                    markTaskAsDone(tasks, input);
+                    storage.saveTasks(tasks);
                 } else if (input.startsWith(TODO_PREFIX)) {
-                    taskCount = addTodo(tasks, taskCount, input);
+                    addTodo(tasks, input);
+                    storage.saveTasks(tasks);
                 } else if (input.startsWith(DEADLINE_PREFIX)) {
-                    taskCount = addDeadline(tasks, taskCount, input);
+                    addDeadline(tasks, input);
+                    storage.saveTasks(tasks);
                 } else if (input.startsWith(EVENT_PREFIX)) {
-                    taskCount = addEvent(tasks, taskCount, input);
+                    addEvent(tasks, input);
+                    storage.saveTasks(tasks);
                 } else {
                     throw new WenwenException("Sorry, I don't know that command yet.");
                 }
             } catch (WenwenException e) {
                 printError(e.getMessage());
             }
+        }
+    }
+
+    /**
+     * Loads saved tasks without preventing startup when the data is unavailable.
+     *
+     * @param storage The storage service to load from.
+     * @return The saved tasks, or an empty list if loading fails.
+     */
+    private static List<Task> loadTasks(Storage storage) {
+        try {
+            return storage.loadTasks();
+        } catch (WenwenException exception) {
+            printError(exception.getMessage() + " Starting with an empty list instead.");
+            return new ArrayList<>();
         }
     }
 
@@ -91,13 +115,12 @@ public class Wenwen {
     /**
      * Prints all currently stored tasks.
      *
-     * @param tasks The task array containing stored tasks.
-     * @param taskCount The number of tasks currently stored.
+     * @param tasks The list containing stored tasks.
      */
-    private static void printTaskList(Task[] tasks, int taskCount) {
+    private static void printTaskList(List<Task> tasks) {
         System.out.println("Here are the tasks in your list:");
-        for (int i = 0; i < taskCount; i++) {
-            System.out.println((i + 1) + "." + tasks[i]);
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println((i + 1) + "." + tasks.get(i));
         }
         System.out.println(LINE);
     }
@@ -105,32 +128,30 @@ public class Wenwen {
     /**
      * Marks the task named in the user input as completed.
      *
-     * @param tasks The task array containing stored tasks.
-     * @param taskCount The number of tasks currently stored.
+     * @param tasks The list containing stored tasks.
      * @param input The full user command.
      * @throws WenwenException If the command does not contain a valid task number.
      */
-    private static void markTaskAsDone(Task[] tasks, int taskCount, String input) throws WenwenException {
-        int taskIndex = getTaskIndex(input, MARK_PREFIX, taskCount);
-        tasks[taskIndex].markAsDone();
+    private static void markTaskAsDone(List<Task> tasks, String input) throws WenwenException {
+        int taskIndex = getTaskIndex(input, MARK_PREFIX, tasks.size());
+        tasks.get(taskIndex).markAsDone();
         System.out.println("Nice! I've marked this task as done:");
-        System.out.println("  " + tasks[taskIndex]);
+        System.out.println("  " + tasks.get(taskIndex));
         System.out.println(LINE);
     }
 
     /**
      * Marks the task named in the user input as not completed.
      *
-     * @param tasks The task array containing stored tasks.
-     * @param taskCount The number of tasks currently stored.
+     * @param tasks The list containing stored tasks.
      * @param input The full user command.
      * @throws WenwenException If the command does not contain a valid task number.
      */
-    private static void markTaskAsNotDone(Task[] tasks, int taskCount, String input) throws WenwenException {
-        int taskIndex = getTaskIndex(input, UNMARK_PREFIX, taskCount);
-        tasks[taskIndex].markAsNotDone();
+    private static void markTaskAsNotDone(List<Task> tasks, String input) throws WenwenException {
+        int taskIndex = getTaskIndex(input, UNMARK_PREFIX, tasks.size());
+        tasks.get(taskIndex).markAsNotDone();
         System.out.println("OK, I've marked this task as not done yet:");
-        System.out.println("  " + tasks[taskIndex]);
+        System.out.println("  " + tasks.get(taskIndex));
         System.out.println(LINE);
     }
 
@@ -163,34 +184,27 @@ public class Wenwen {
     /**
      * Adds a todo task from the user input.
      *
-     * @param tasks The task array containing stored tasks.
-     * @param taskCount The number of tasks currently stored.
+     * @param tasks The list containing stored tasks.
      * @param input The full user command.
-     * @return The updated task count.
-     * @throws WenwenException If the todo description is empty or the list is full.
+     * @throws WenwenException If the todo description is empty.
      */
-    private static int addTodo(Task[] tasks, int taskCount, String input) throws WenwenException {
-        ensureTaskSpace(taskCount);
+    private static void addTodo(List<Task> tasks, String input) throws WenwenException {
         String description = getCommandDetails(input, TODO_PREFIX);
         ensureNotEmpty(description, "The description of a todo cannot be empty.");
 
-        tasks[taskCount] = new Todo(description);
-        taskCount++;
-        printTaskAdded(tasks[taskCount - 1], taskCount);
-        return taskCount;
+        Task task = new Todo(description);
+        tasks.add(task);
+        printTaskAdded(task, tasks.size());
     }
 
     /**
      * Adds a deadline task from the user input if it follows the expected command format.
      *
-     * @param tasks The task array containing stored tasks.
-     * @param taskCount The number of tasks currently stored.
+     * @param tasks The list containing stored tasks.
      * @param input The full user command.
-     * @return The updated task count, or the original task count if the command is invalid.
      * @throws WenwenException If the deadline command has invalid or incomplete details.
      */
-    private static int addDeadline(Task[] tasks, int taskCount, String input) throws WenwenException {
-        ensureTaskSpace(taskCount);
+    private static void addDeadline(List<Task> tasks, String input) throws WenwenException {
         int byIndex = input.indexOf(BY_SEPARATOR);
         if (byIndex < 0) {
             throw new WenwenException("Please use: deadline DESCRIPTION /by DATE_OR_TIME");
@@ -201,23 +215,19 @@ public class Wenwen {
         ensureNotEmpty(description, "The description of a deadline cannot be empty.");
         ensureNotEmpty(by, "The deadline needs a date or time after /by.");
 
-        tasks[taskCount] = new Deadline(description, by);
-        taskCount++;
-        printTaskAdded(tasks[taskCount - 1], taskCount);
-        return taskCount;
+        Task task = new Deadline(description, by);
+        tasks.add(task);
+        printTaskAdded(task, tasks.size());
     }
 
     /**
      * Adds an event task from the user input if it follows the expected command format.
      *
-     * @param tasks The task array containing stored tasks.
-     * @param taskCount The number of tasks currently stored.
+     * @param tasks The list containing stored tasks.
      * @param input The full user command.
-     * @return The updated task count, or the original task count if the command is invalid.
      * @throws WenwenException If the event command has invalid or incomplete details.
      */
-    private static int addEvent(Task[] tasks, int taskCount, String input) throws WenwenException {
-        ensureTaskSpace(taskCount);
+    private static void addEvent(List<Task> tasks, String input) throws WenwenException {
         int fromIndex = input.indexOf(FROM_SEPARATOR);
         int toIndex = input.indexOf(TO_SEPARATOR);
         if (fromIndex < 0 || toIndex < 0 || fromIndex >= toIndex) {
@@ -231,10 +241,9 @@ public class Wenwen {
         ensureNotEmpty(from, "The event needs a start time after /from.");
         ensureNotEmpty(to, "The event needs an end time after /to.");
 
-        tasks[taskCount] = new Event(description, from, to);
-        taskCount++;
-        printTaskAdded(tasks[taskCount - 1], taskCount);
-        return taskCount;
+        Task task = new Event(description, from, to);
+        tasks.add(task);
+        printTaskAdded(task, tasks.size());
     }
 
     /**
@@ -255,19 +264,6 @@ public class Wenwen {
         }
 
         return input.substring(commandPrefix.length()).trim();
-    }
-
-    /**
-     * Ensures there is still room to add another task.
-     *
-     * @param taskCount The number of tasks currently stored.
-     * @throws WenwenException If the task list has reached its fixed capacity.
-     */
-    private static void ensureTaskSpace(int taskCount) throws WenwenException {
-        if (taskCount >= MAX_TASKS) {
-            throw new WenwenException("Your task list is full. "
-                    + "Please complete the current list before adding more.");
-        }
     }
 
     /**
