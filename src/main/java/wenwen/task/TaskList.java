@@ -122,6 +122,13 @@ public class TaskList {
         return new TaskList(matchingTasks);
     }
 
+    /**
+     * Converts and validates a one-based task number as a list index.
+     *
+     * @param taskNumber one-based task number
+     * @return zero-based list index
+     * @throws WenwenException if the task number is outside the list
+     */
     private int toIndex(int taskNumber) throws WenwenException {
         if (taskNumber < 1 || taskNumber > tasks.size()) {
             throw new WenwenException("Task number " + taskNumber + " is not in your list.");

@@ -70,6 +70,11 @@ public class Wenwen {
         new Wenwen(DATA_FILE_PATH).run();
     }
 
+    /**
+     * Loads saved tasks and falls back to an empty list if loading fails.
+     *
+     * @return loaded tasks, or an empty task list after a loading error
+     */
     private TaskList loadTasks() {
         try {
             return new TaskList(storage.loadTasks());

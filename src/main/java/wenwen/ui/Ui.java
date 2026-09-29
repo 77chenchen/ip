@@ -189,6 +189,11 @@ public class Ui {
         showError(message + " Starting with an empty list instead.");
     }
 
+    /**
+     * Shows the current task count using the correct singular or plural noun.
+     *
+     * @param taskCount number of tasks in the list
+     */
     private void showTaskCount(int taskCount) {
         String taskWord = taskCount == 1 ? "task" : "tasks";
         output.println("Now you have " + taskCount + " " + taskWord + " in the list.");
