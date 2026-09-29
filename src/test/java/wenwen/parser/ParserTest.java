@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import wenwen.command.AddCommand;
 import wenwen.command.DeleteCommand;
 import wenwen.command.ExitCommand;
+import wenwen.command.FindCommand;
 import wenwen.command.ListCommand;
 import wenwen.command.MarkCommand;
 import wenwen.command.OnDateCommand;
@@ -26,6 +27,7 @@ class ParserTest {
         assertInstanceOf(AddCommand.class,
                 Parser.parse("event meeting /from 2026-10-02 1400 /to 2026-10-02 1500"));
         assertInstanceOf(OnDateCommand.class, Parser.parse("on 2026-10-02"));
+        assertInstanceOf(FindCommand.class, Parser.parse("find book"));
     }
 
     @Test
@@ -40,5 +42,6 @@ class ParserTest {
         assertThrows(WenwenException.class,
                 () -> Parser.parse("event meeting /from 2026-10-02 1500 /to 2026-10-02 1400"));
         assertThrows(WenwenException.class, () -> Parser.parse("on 02/10/2026"));
+        assertThrows(WenwenException.class, () -> Parser.parse("find"));
     }
 }
