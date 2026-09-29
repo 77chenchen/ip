@@ -2,6 +2,9 @@ package wenwen.ui;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Scanner;
 
 import wenwen.task.Task;
@@ -11,6 +14,8 @@ import wenwen.task.TaskList;
  * Handles all console input and output for Wenwen.
  */
 public class Ui {
+    private static final DateTimeFormatter DISPLAY_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
     private static final String LINE = "____________________________________________________________";
     private static final String BANNER = " __        __                                  \n"
             + " \\ \\      / /__ _ ____      _____ _ __       \n"
@@ -90,6 +95,20 @@ public class Ui {
      */
     public void showTaskList(TaskList tasks) {
         output.println("Here are the tasks in your list:");
+        for (int i = 0; i < tasks.size(); i++) {
+            output.println((i + 1) + "." + tasks.get(i));
+        }
+        showLine();
+    }
+
+    /**
+     * Shows deadline and event tasks that occur on a date.
+     *
+     * @param date date that was requested
+     * @param tasks tasks occurring on that date
+     */
+    public void showTasksOnDate(LocalDate date, TaskList tasks) {
+        output.println("Here are the tasks on " + date.format(DISPLAY_DATE_FORMAT) + ":");
         for (int i = 0; i < tasks.size(); i++) {
             output.println((i + 1) + "." + tasks.get(i));
         }

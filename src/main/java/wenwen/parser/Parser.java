@@ -1,11 +1,18 @@
 package wenwen.parser;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
+
 import wenwen.command.AddCommand;
 import wenwen.command.Command;
 import wenwen.command.DeleteCommand;
 import wenwen.command.ExitCommand;
 import wenwen.command.ListCommand;
 import wenwen.command.MarkCommand;
+import wenwen.command.OnDateCommand;
 import wenwen.exception.WenwenException;
 import wenwen.task.Deadline;
 import wenwen.task.Event;
@@ -15,6 +22,10 @@ import wenwen.task.Todo;
  * Converts raw user input into executable commands.
  */
 public final class Parser {
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("uuuu-MM-dd")
+            .withResolverStyle(ResolverStyle.STRICT);
+    private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("uuuu-MM-dd HHmm")
+            .withResolverStyle(ResolverStyle.STRICT);
     private static final String BY_SEPARATOR = " /by ";
     private static final String FROM_SEPARATOR = " /from ";
     private static final String TO_SEPARATOR = " /to ";
@@ -46,6 +57,8 @@ public final class Parser {
             return new MarkCommand(parseTaskNumber(input, commandWord), false);
         case "delete":
             return new DeleteCommand(parseTaskNumber(input, commandWord));
+        case "on":
+            return new OnDateCommand(parseDate(getCommandDetails(input, commandWord)));
         case "todo":
             return parseTodo(input);
         case "deadline":
@@ -70,10 +83,10 @@ public final class Parser {
         }
 
         String description = input.substring("deadline".length(), byIndex).trim();
-        String by = input.substring(byIndex + BY_SEPARATOR.length()).trim();
+        String byText = input.substring(byIndex + BY_SEPARATOR.length()).trim();
         ensureNotEmpty(description, "The description of a deadline cannot be empty.");
-        ensureNotEmpty(by, "The deadline needs a date or time after /by.");
-        return new AddCommand(new Deadline(description, by));
+        ensureNotEmpty(byText, "The deadline needs a date after /by.");
+        return new AddCommand(new Deadline(description, parseDate(byText)));
     }
 
     private static Command parseEvent(String input) throws WenwenException {
@@ -84,11 +97,16 @@ public final class Parser {
         }
 
         String description = input.substring("event".length(), fromIndex).trim();
-        String from = input.substring(fromIndex + FROM_SEPARATOR.length(), toIndex).trim();
-        String to = input.substring(toIndex + TO_SEPARATOR.length()).trim();
+        String fromText = input.substring(fromIndex + FROM_SEPARATOR.length(), toIndex).trim();
+        String toText = input.substring(toIndex + TO_SEPARATOR.length()).trim();
         ensureNotEmpty(description, "The description of an event cannot be empty.");
-        ensureNotEmpty(from, "The event needs a start time after /from.");
-        ensureNotEmpty(to, "The event needs an end time after /to.");
+        ensureNotEmpty(fromText, "The event needs a start date and time after /from.");
+        ensureNotEmpty(toText, "The event needs an end date and time after /to.");
+        LocalDateTime from = parseDateTime(fromText);
+        LocalDateTime to = parseDateTime(toText);
+        if (to.isBefore(from)) {
+            throw new WenwenException("The event end must not be before its start.");
+        }
         return new AddCommand(new Event(description, from, to));
     }
 
@@ -98,6 +116,22 @@ public final class Parser {
             return Integer.parseInt(taskNumberText);
         } catch (NumberFormatException exception) {
             throw new WenwenException("Please give me a valid task number for '" + commandWord + "'.");
+        }
+    }
+
+    private static LocalDate parseDate(String text) throws WenwenException {
+        try {
+            return LocalDate.parse(text, DATE_FORMAT);
+        } catch (DateTimeParseException exception) {
+            throw new WenwenException("Please use a valid date in yyyy-MM-dd format.");
+        }
+    }
+
+    private static LocalDateTime parseDateTime(String text) throws WenwenException {
+        try {
+            return LocalDateTime.parse(text, DATE_TIME_FORMAT);
+        } catch (DateTimeParseException exception) {
+            throw new WenwenException("Please use a valid date and time in yyyy-MM-dd HHmm format.");
         }
     }
 

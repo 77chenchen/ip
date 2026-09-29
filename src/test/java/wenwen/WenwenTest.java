@@ -25,8 +25,9 @@ class WenwenTest {
     void run_typicalSession_updatesStorageAndShowsResponses() throws Exception {
         String commands = String.join("\n",
                 "todo read book",
-                "deadline return book /by Friday",
+                "deadline return book /by 2026-10-02",
                 "mark 1",
+                "on 2026-10-02",
                 "list",
                 "delete 2",
                 "bye") + "\n";
@@ -41,6 +42,8 @@ class WenwenTest {
         String transcript = output.toString(StandardCharsets.UTF_8);
         assertTrue(transcript.contains("Got it. I've added this task:"));
         assertTrue(transcript.contains("[T][X] read book"));
+        assertTrue(transcript.contains("Here are the tasks on Oct 02 2026:"));
+        assertTrue(transcript.contains("[D][ ] return book (by: Oct 02 2026)"));
         assertTrue(transcript.contains("Noted. I've removed this task:"));
         assertTrue(transcript.contains("Bye. Hope to see you again soon!"));
 

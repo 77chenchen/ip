@@ -1,5 +1,6 @@
 package wenwen.task;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -85,6 +86,22 @@ public class TaskList {
      */
     public List<Task> asList() {
         return Collections.unmodifiableList(tasks);
+    }
+
+    /**
+     * Returns tasks whose deadline or event period falls on a date.
+     *
+     * @param date date to search
+     * @return matching tasks in their original order
+     */
+    public TaskList findOnDate(LocalDate date) {
+        List<Task> matchingTasks = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task.occursOn(date)) {
+                matchingTasks.add(task);
+            }
+        }
+        return new TaskList(matchingTasks);
     }
 
     private int toIndex(int taskNumber) throws WenwenException {

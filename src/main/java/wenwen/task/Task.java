@@ -1,5 +1,7 @@
 package wenwen.task;
 
+import java.time.LocalDate;
+
 /**
  * Represents one task in the chatbot's task list.
  */
@@ -66,6 +68,16 @@ public abstract class Task {
      */
     public boolean isDone() {
         return isDone;
+    }
+
+    /**
+     * Returns whether this task occurs on the supplied date.
+     *
+     * @param date date to check
+     * @return true if the task has a date that matches the supplied date
+     */
+    public boolean occursOn(LocalDate date) {
+        return false;
     }
 
     /**
