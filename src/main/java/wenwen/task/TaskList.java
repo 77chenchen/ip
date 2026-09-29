@@ -1,0 +1,96 @@
+package wenwen.task;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import wenwen.exception.WenwenException;
+
+/**
+ * Owns Wenwen's task collection and provides task-related operations.
+ */
+public class TaskList {
+    private final List<Task> tasks;
+
+    /**
+     * Creates an empty task list.
+     */
+    public TaskList() {
+        this(new ArrayList<>());
+    }
+
+    /**
+     * Creates a task list containing the supplied tasks.
+     *
+     * @param tasks initial tasks
+     */
+    public TaskList(List<Task> tasks) {
+        this.tasks = new ArrayList<>(tasks);
+    }
+
+    /**
+     * Adds a task to the end of the list.
+     *
+     * @param task task to add
+     */
+    public void add(Task task) {
+        tasks.add(task);
+    }
+
+    /**
+     * Returns a task using a one-based task number.
+     *
+     * @param taskNumber one-based task number
+     * @return the requested task
+     * @throws WenwenException if the task number is outside the list
+     */
+    public Task getByNumber(int taskNumber) throws WenwenException {
+        return tasks.get(toIndex(taskNumber));
+    }
+
+    /**
+     * Removes and returns a task using a one-based task number.
+     *
+     * @param taskNumber one-based task number
+     * @return the removed task
+     * @throws WenwenException if the task number is outside the list
+     */
+    public Task delete(int taskNumber) throws WenwenException {
+        return tasks.remove(toIndex(taskNumber));
+    }
+
+    /**
+     * Returns a task using its zero-based position for display iteration.
+     *
+     * @param index zero-based position
+     * @return task at the position
+     */
+    public Task get(int index) {
+        return tasks.get(index);
+    }
+
+    /**
+     * Returns the number of stored tasks.
+     *
+     * @return number of tasks
+     */
+    public int size() {
+        return tasks.size();
+    }
+
+    /**
+     * Returns a read-only view for persistence.
+     *
+     * @return unmodifiable task view
+     */
+    public List<Task> asList() {
+        return Collections.unmodifiableList(tasks);
+    }
+
+    private int toIndex(int taskNumber) throws WenwenException {
+        if (taskNumber < 1 || taskNumber > tasks.size()) {
+            throw new WenwenException("Task number " + taskNumber + " is not in your list.");
+        }
+        return taskNumber - 1;
+    }
+}
