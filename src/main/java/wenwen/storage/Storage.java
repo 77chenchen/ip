@@ -6,6 +6,8 @@ import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -108,11 +110,12 @@ public class Storage {
             return String.join(FIELD_SEPARATOR, TODO_CODE, status, description);
         } else if (task instanceof Deadline) {
             Deadline deadline = (Deadline) task;
-            return String.join(FIELD_SEPARATOR, DEADLINE_CODE, status, description, encode(deadline.getBy()));
+            return String.join(FIELD_SEPARATOR, DEADLINE_CODE, status, description,
+                    encode(deadline.getBy().toString()));
         } else if (task instanceof Event) {
             Event event = (Event) task;
             return String.join(FIELD_SEPARATOR, EVENT_CODE, status, description,
-                    encode(event.getFrom()), encode(event.getTo()));
+                    encode(event.getFrom().toString()), encode(event.getTo().toString()));
         }
 
         throw new WenwenException("I couldn't save an unknown task type.");
@@ -137,10 +140,11 @@ public class Storage {
                 return new Todo(description, isDone);
             case DEADLINE_CODE:
                 requireFieldCount(fields, 4);
-                return new Deadline(description, decode(fields[3]), isDone);
+                return new Deadline(description, LocalDate.parse(decode(fields[3])), isDone);
             case EVENT_CODE:
                 requireFieldCount(fields, 5);
-                return new Event(description, decode(fields[3]), decode(fields[4]), isDone);
+                return new Event(description, LocalDateTime.parse(decode(fields[3])),
+                        LocalDateTime.parse(decode(fields[4])), isDone);
             default:
                 throw new IllegalArgumentException();
             }
