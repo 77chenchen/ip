@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import wenwen.exception.WenwenException;
 
@@ -98,6 +99,23 @@ public class TaskList {
         List<Task> matchingTasks = new ArrayList<>();
         for (Task task : tasks) {
             if (task.occursOn(date)) {
+                matchingTasks.add(task);
+            }
+        }
+        return new TaskList(matchingTasks);
+    }
+
+    /**
+     * Returns tasks whose descriptions contain a keyword, ignoring case.
+     *
+     * @param keyword text to search for
+     * @return matching tasks in their original order
+     */
+    public TaskList find(String keyword) {
+        String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
+        List<Task> matchingTasks = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task.getDescription().toLowerCase(Locale.ROOT).contains(normalizedKeyword)) {
                 matchingTasks.add(task);
             }
         }

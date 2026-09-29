@@ -27,6 +27,7 @@ class WenwenTest {
                 "todo read book",
                 "deadline return book /by 2026-10-02",
                 "mark 1",
+                "find BOOK",
                 "on 2026-10-02",
                 "list",
                 "delete 2",
@@ -42,6 +43,7 @@ class WenwenTest {
         String transcript = output.toString(StandardCharsets.UTF_8);
         assertTrue(transcript.contains("Got it. I've added this task:"));
         assertTrue(transcript.contains("[T][X] read book"));
+        assertTrue(transcript.contains("Here are the matching tasks in your list:"));
         assertTrue(transcript.contains("Here are the tasks on Oct 02 2026:"));
         assertTrue(transcript.contains("[D][ ] return book (by: Oct 02 2026)"));
         assertTrue(transcript.contains("Noted. I've removed this task:"));

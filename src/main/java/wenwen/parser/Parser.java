@@ -10,6 +10,7 @@ import wenwen.command.AddCommand;
 import wenwen.command.Command;
 import wenwen.command.DeleteCommand;
 import wenwen.command.ExitCommand;
+import wenwen.command.FindCommand;
 import wenwen.command.ListCommand;
 import wenwen.command.MarkCommand;
 import wenwen.command.OnDateCommand;
@@ -59,6 +60,8 @@ public final class Parser {
             return new DeleteCommand(parseTaskNumber(input, commandWord));
         case "on":
             return new OnDateCommand(parseDate(getCommandDetails(input, commandWord)));
+        case "find":
+            return parseFind(input);
         case "todo":
             return parseTodo(input);
         case "deadline":
@@ -74,6 +77,12 @@ public final class Parser {
         String description = getCommandDetails(input, "todo");
         ensureNotEmpty(description, "The description of a todo cannot be empty.");
         return new AddCommand(new Todo(description));
+    }
+
+    private static Command parseFind(String input) throws WenwenException {
+        String keyword = getCommandDetails(input, "find");
+        ensureNotEmpty(keyword, "Please give me a keyword to find.");
+        return new FindCommand(keyword);
     }
 
     private static Command parseDeadline(String input) throws WenwenException {

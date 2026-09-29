@@ -28,4 +28,18 @@ class TaskListTest {
 
         assertThrows(WenwenException.class, () -> tasks.getByNumber(1));
     }
+
+    @Test
+    void find_keywordWithDifferentCase_returnsMatchingTasks() {
+        TaskList tasks = new TaskList(List.of(
+                new Todo("Read book"),
+                new Todo("write essay"),
+                new Todo("return BOOK")));
+
+        TaskList matches = tasks.find("book");
+
+        assertEquals(2, matches.size());
+        assertEquals("Read book", matches.get(0).getDescription());
+        assertEquals("return BOOK", matches.get(1).getDescription());
+    }
 }
