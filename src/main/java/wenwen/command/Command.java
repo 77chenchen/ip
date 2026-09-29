@@ -10,6 +10,12 @@ import wenwen.ui.Ui;
  */
 public abstract class Command {
     /**
+     * Creates a command for a parsed user request.
+     */
+    protected Command() {
+    }
+
+    /**
      * Performs this command using Wenwen's application services.
      *
      * @param tasks task list to read or update
