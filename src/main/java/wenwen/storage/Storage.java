@@ -135,18 +135,18 @@ public class Storage {
             String description = decode(fields[2]);
 
             switch (fields[0]) {
-            case TODO_CODE:
-                requireFieldCount(fields, 3);
-                return new Todo(description, isDone);
-            case DEADLINE_CODE:
-                requireFieldCount(fields, 4);
-                return new Deadline(description, LocalDate.parse(decode(fields[3])), isDone);
-            case EVENT_CODE:
-                requireFieldCount(fields, 5);
-                return new Event(description, LocalDateTime.parse(decode(fields[3])),
-                        LocalDateTime.parse(decode(fields[4])), isDone);
-            default:
-                throw new IllegalArgumentException();
+                case TODO_CODE:
+                    requireFieldCount(fields, 3);
+                    return new Todo(description, isDone);
+                case DEADLINE_CODE:
+                    requireFieldCount(fields, 4);
+                    return new Deadline(description, LocalDate.parse(decode(fields[3])), isDone);
+                case EVENT_CODE:
+                    requireFieldCount(fields, 5);
+                    return new Event(description, LocalDateTime.parse(decode(fields[3])),
+                            LocalDateTime.parse(decode(fields[4])), isDone);
+                default:
+                    throw new IllegalArgumentException();
             }
         } catch (IllegalArgumentException exception) {
             throw new WenwenException("Saved task data is corrupted at line " + lineNumber + ".");

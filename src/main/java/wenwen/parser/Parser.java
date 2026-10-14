@@ -49,30 +49,30 @@ public final class Parser {
         String commandWord = getCommandWord(input);
 
         switch (commandWord) {
-        case "bye":
-            ensureNoDetails(input, commandWord);
-            return new ExitCommand();
-        case "list":
-            ensureNoDetails(input, commandWord);
-            return new ListCommand();
-        case "mark":
-            return new MarkCommand(parseTaskNumber(input, commandWord), true);
-        case "unmark":
-            return new MarkCommand(parseTaskNumber(input, commandWord), false);
-        case "delete":
-            return new DeleteCommand(parseTaskNumber(input, commandWord));
-        case "on":
-            return new OnDateCommand(parseDate(getCommandDetails(input, commandWord)));
-        case "find":
-            return parseFind(input);
-        case "todo":
-            return parseTodo(input);
-        case "deadline":
-            return parseDeadline(input);
-        case "event":
-            return parseEvent(input);
-        default:
-            throw new WenwenException("Sorry, I don't know that command yet.");
+            case "bye":
+                ensureNoDetails(input, commandWord);
+                return new ExitCommand();
+            case "list":
+                ensureNoDetails(input, commandWord);
+                return new ListCommand();
+            case "mark":
+                return new MarkCommand(parseTaskNumber(input, commandWord), true);
+            case "unmark":
+                return new MarkCommand(parseTaskNumber(input, commandWord), false);
+            case "delete":
+                return new DeleteCommand(parseTaskNumber(input, commandWord));
+            case "on":
+                return new OnDateCommand(parseDate(getCommandDetails(input, commandWord)));
+            case "find":
+                return parseFind(input);
+            case "todo":
+                return parseTodo(input);
+            case "deadline":
+                return parseDeadline(input);
+            case "event":
+                return parseEvent(input);
+            default:
+                throw new WenwenException("Sorry, I don't know that command yet.");
         }
     }
 
